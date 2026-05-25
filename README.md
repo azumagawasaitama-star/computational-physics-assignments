@@ -185,4 +185,5 @@ U_L
 - L. Onsager, *Phys. Rev.* **65**, 117 (1944).
 - K. Binder, *Z. Phys. B* **43**, 119 (1981). （ビンダーキュムラントの導入）
 - N. Metropolis et al., *J. Chem. Phys.* **21**, 1087 (1953). （メトロポリス法）
+- W. K. Hastings, *Biometrika* **57**, 97 (1970). （詳細釣り合い条件の数学的定式化；Metropolis--Hastings法）
 - M. E. J. Newman and G. T. Barkema, *Monte Carlo Methods in Statistical Physics*, Oxford (1999).
