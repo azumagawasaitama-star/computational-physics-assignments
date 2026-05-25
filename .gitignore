@@ -1,0 +1,31 @@
+# TeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.dvi
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Data / output (generated)
+*.npy
+*.npz
+*.h5
+*.csv
+*.dat
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+*.swp
+*~

@@ -1,0 +1,193 @@
+\documentclass[12pt,a4paper]{ltjsarticle}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{bm}
+
+\geometry{margin=25mm}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{green!60!black},
+  stringstyle=\color{orange},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  frame=single,
+  breaklines=true,
+  language=Python
+}
+
+\title{\Large 課題1：2次元強磁性イジング模型の転移温度\\
+\large 古典モンテカルロ法による数値計算}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+%=============================================================
+\section{問題設定}
+%=============================================================
+
+\subsection{モデルのハミルトニアン}
+
+2次元正方格子上の強磁性イジング模型のハミルトニアンは以下で与えられる：
+
+\begin{equation}
+  H = -J \sum_{\langle i,j \rangle} s_i s_j
+  \label{eq:hamiltonian}
+\end{equation}
+
+ここで，$s_i = \pm 1$ は各格子点 $i$ のスピン変数，$J > 0$ は強磁性結合定数，
+$\langle i,j \rangle$ は最近接サイトのペアを表す．
+以下では $J = k_B = 1$ に規格化する．
+
+\subsection{系のサイズと境界条件}
+
+系は $L \times L$ の正方格子とし，周期境界条件を課す：
+\begin{equation}
+  s_{L+1,\, j} = s_{1,\, j}, \qquad s_{i,\, L+1} = s_{i,\, 1}.
+\end{equation}
+これにより格子はトーラス（ドーナツ面）と同相になり，表面効果を取り除くことができる．
+
+\subsection{厳密解（Onsager解）}
+
+2次元イジング模型はOnsager（1944）により厳密に解かれており，転移温度の厳密値は
+\begin{equation}
+  \frac{k_B T_c}{J} = \frac{2}{\ln(1+\sqrt{2})} \approx 2.2692
+  \label{eq:onsager}
+\end{equation}
+で与えられる．本課題ではこの厳密値との比較によりモンテカルロ計算の精度を検証する．
+
+%=============================================================
+\section{モンテカルロ法}
+%=============================================================
+
+\subsection{メトロポリスアルゴリズム}
+
+カノニカル集団（温度 $T$ 固定）でのサンプリングにはメトロポリスアルゴリズムを用いる．
+1回の更新試行は以下のステップからなる：
+
+\begin{enumerate}
+  \item サイト $(i,j)$ をランダムに選ぶ．
+  \item スピン反転 $s_{i,j} \to -s_{i,j}$ に伴うエネルギー変化
+        \begin{equation}
+          \Delta E = 2 J s_{i,j} \sum_{\delta} s_{i+\delta}
+        \end{equation}
+        を計算する（$\delta$ は4つの最近接方向）．
+  \item 受理確率
+        \begin{equation}
+          P_{\rm accept} = \min\!\left(1,\; e^{-\Delta E / k_B T}\right)
+        \end{equation}
+        でスピン反転を受理または棄却する．
+\end{enumerate}
+
+\subsection{1モンテカルロステップ（1 MCS）}
+
+1モンテカルロステップ（1 MCS）とは，全 $L^2$ サイトの状態更新を1回ずつ試みることに対応する．
+1サイトの更新コストは最近接4サイトの参照のみであるから $O(1)$，
+1 MCS 全体のコストは
+\begin{equation}
+  \text{1 MCS のコスト} = O(L^2).
+\end{equation}
+したがって，$N_{\rm step}$ ステップの全計算時間は $O(N_{\rm step} \cdot L^2)$ でスケールする．
+
+\subsection{熱化と測定}
+
+十分長い熱化（thermalization）ステップの後，物理量を測定する．
+熱化とは系が初期配置の影響を忘れ，平衡分布に収束するまでの過程である．
+本計算では $N_{\rm therm}$ ステップ熱化した後，$N_{\rm meas}$ ステップにわたり測定を行う．
+
+%=============================================================
+\section{観測量}
+%=============================================================
+
+\subsection{磁化と磁化率}
+
+単位体積あたりの磁化および磁化率を以下で定義する：
+
+\begin{align}
+  m &= \frac{1}{L^2} \sum_{i} s_i, \\
+  \chi &= \frac{L^2}{k_B T}\Bigl(\langle m^2 \rangle - \langle |m| \rangle^2\Bigr).
+\end{align}
+
+磁化率 $\chi$ は相転移点付近で発散し，有限系では $L$ に依存したピークを示す．
+
+\subsection{ビンダーキュムラント}
+
+有限サイズスケーリングに用いるビンダーキュムラント（Binder cumulant）を
+\begin{equation}
+  U_L = 1 - \frac{\langle m^4 \rangle}{3\langle m^2 \rangle^2}
+  \label{eq:binder}
+\end{equation}
+と定義する．$U_L$ は純粋な $\mathbb{Z}_2$ 対称性が破れた秩序相では $U_L \to 2/3$，
+無秩序相では $U_L \to 0$ に漸近する．
+
+\subsection{有限サイズスケーリングとビンダークロス}
+
+スケーリング理論によれば，ビンダーキュムラントは転移点付近で
+\begin{equation}
+  U_L(T) = f\!\left[(T - T_c) L^{1/\nu}\right]
+\end{equation}
+というスケーリング形式をとる（$\nu$ は相関長の臨界指数）．
+この性質から，\textbf{異なるシステムサイズ $L$ での $U_L(T)$ 曲線は $T = T_c$ で交差する}．
+この交点（ビンダークロス）を用いて $T_c$ を決定する（図\ref{fig:binder_schematic}参照）．
+
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.7\textwidth}
+    \small
+    \textit{（ビンダーキュムラントの模式図：異なる $L$ の曲線が $T_c$ で交差する）}
+  \end{minipage}
+  \caption{ビンダーキュムラント $U_L$ の温度依存性の模式図．}
+  \label{fig:binder_schematic}
+\end{figure}
+
+%=============================================================
+\section{計算手順のまとめ}
+%=============================================================
+
+\begin{enumerate}
+  \item $L = 8, 16, 32, 64$ 等，複数のシステムサイズについて計算を実行する．
+  \item 各 $L$，各温度 $T$ に対して $N_{\rm therm}$ MCS 熱化し，$N_{\rm meas}$ MCS 測定する．
+  \item $m$，$\chi$，$U_L$ を温度の関数としてプロットする．
+  \item ビンダーキュムラントの交差点から $T_c$ を推定し，Onsager解（式\eqref{eq:onsager}）と比較する．
+  \item 計算時間の $L$ 依存性を測定し，$O(L^2)$ スケーリングを確認する．
+  \item 小さな $L$ に対するユニットテストを実施する（エネルギー計算，詳細釣り合い条件等）．
+\end{enumerate}
+
+%=============================================================
+\section{実装上の注意点}
+%=============================================================
+
+\begin{itemize}
+  \item \textbf{周期境界条件}：インデックス計算に \texttt{mod} 演算を用いる．
+  \item \textbf{初期配置}：高温ではランダム配置，低温では全スピン整列配置が収束を速める
+        （あるいは両方から始めて一致を確認する）．
+  \item \textbf{統計誤差}：独立なサンプルを得るために自己相関時間を考慮する．
+        簡便には jackknife 法や bootstrap 法で誤差を推定する．
+  \item \textbf{乱数}：メルセンヌ・ツイスタ等の品質の高い擬似乱数生成器を用いる．
+  \item \textbf{$O(L^2)$ スケーリングの確認}：$L$ を2倍にするごとに計算時間が約4倍になることを確認する．
+\end{itemize}
+
+%=============================================================
+\appendix
+\section{参考文献}
+%=============================================================
+
+\begin{itemize}
+  \item L. Onsager, \textit{Phys. Rev.} \textbf{65}, 117 (1944).
+  \item K. Binder, \textit{Z. Phys. B} \textbf{43}, 119 (1981)．（ビンダーキュムラントの導入）
+  \item N. Metropolis et al., \textit{J. Chem. Phys.} \textbf{21}, 1087 (1953)．（メトロポリス法）
+  \item M. E. J. Newman and G. T. Barkema,
+        \textit{Monte Carlo Methods in Statistical Physics}, Oxford (1999).
+\end{itemize}
+
+\end{document}
