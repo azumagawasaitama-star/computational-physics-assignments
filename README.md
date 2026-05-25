@@ -28,7 +28,6 @@ $$H = -J \sum_{\langle i,j \rangle} s_i s_j$$
 | $J > 0$ | 強磁性結合定数 |
 | $\langle i,j \rangle$ | 最近接サイトのペア |
 
-以下では $J = k_B = 1$ に規格化する。
 
 ### 系のサイズと境界条件
 
