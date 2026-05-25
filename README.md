@@ -205,6 +205,7 @@ $\nu=1$ なので、スケーリング変数は $(T-T_c)L$ とシンプルにな
 ## 7. 参考文献
 
 - L. Onsager, *Phys. Rev.* **65**, 117 (1944).
+- M. E. Fisher and M. N. Barber, *Phys. Rev. Lett.* **28**, 1516 (1972). （有限サイズスケーリング理論の原論文）
 - K. Binder, *Z. Phys. B* **43**, 119 (1981). （ビンダーキュムラントの導入）
 - N. Metropolis et al., *J. Chem. Phys.* **21**, 1087 (1953). （メトロポリス法）
 - W. K. Hastings, *Biometrika* **57**, 97 (1970). （詳細釣り合い条件の数学的定式化；Metropolis--Hastings法）
